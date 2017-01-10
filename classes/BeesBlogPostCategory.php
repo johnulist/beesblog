@@ -17,6 +17,8 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+namespace BeesBlogModule;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -26,47 +28,56 @@ if (!defined('_PS_VERSION_')) {
  */
 class BeesBlogPostCategory extends BeesBlogObjectModel
 {
+    // @codingStandardsIgnoreStart
+    /** @var int $id_bees_blog_post_category */
     public $id_bees_blog_post_category;
-    public $id_author;
-    public static $definition = array(
-        'table' => 'bees_blog_post_category',
-        'primary' => 'id_bees_blog_post_category',
-        'fields' => array(
-            'id_bees_blog_post_category' => array('type' => self::TYPE_INT, 'validate' => 'isunsignedInt', 'required' => true, 'db_type' => 'INT(11) UNSIGNED'),
-            'id_bees_blog_category' => array('type' => self::TYPE_INT, 'validate' => 'isunsignedInt', 'required' => true, 'db_type' => 'INT(11) UNSIGNED'),
-        ),
-    );
+
+    /** @var int $id_blog_category */
+    public $id_blog_category;
+    // @codingStandardsIgnoreEnd
+
+    const PRIMARY = 'id_bees_blog_post_category';
+    const TABLE = 'bees_blog_post_category';
+
+    public static $definition = [
+        'table' => self::TABLE,
+        'primary' => self::PRIMARY,
+        'fields' => [
+            'id_bees_blog_post_category' => ['type' => self::TYPE_INT, 'validate' => 'isunsignedInt', 'required' => true, 'db_type' => 'INT(11) UNSIGNED'],
+            'id_bees_blog_category' => ['type' => self::TYPE_INT, 'validate' => 'isunsignedInt', 'required' => true, 'db_type' => 'INT(11) UNSIGNED'],
+        ],
+    ];
 
     /**
      * Get total by category
      *
-     * @param $idLang
-     * @param $idCategory
-     * @param $limitStart
-     * @param $limit
+     * @param int $idLang
+     * @param int $idCategory
+     * @param int $limitStart
+     * @param int $limit
      *
      * @return array|bool
      */
     public static function getTotalByCategory($idLang, $idCategory, $limitStart, $limit)
     {
-        $results = array();
-        $sql = new DbQuery();
+        $results = [];
+        $sql = new \DbQuery();
         $sql->select('*');
-        $sql->from('bees_blog_post_lang', 'sbpl');
-        $sql->innerJoin('bees_blog_post', 'sbp', 'sbp.`id_bees_blog_post` = sbpl.`id_bees_blog_post`');
+        $sql->from(BeesBlogPost::LANG_TABLE, 'sbpl');
+        $sql->innerJoin(BeesBlogPost::TABLE, 'sbp', 'sbp.`'.BeesBlogPost::PRIMARY.'` = sbpl.`'.BeesBlogPost::PRIMARY.'`');
         $sql->where('sbpl.`id_lang` = '.(int) $idLang);
         $sql->where('sbp.`active` = 1');
         $sql->where('sbp.`id_category` = '.(int) $idCategory);
-        $sql->orderBy('sbp.`id_bees_blog_post` DESC');
+        $sql->orderBy('sbp.`'.BeesBlogPost::PRIMARY.'` DESC');
         $sql->limit((int) $limit, (int) $limitStart);
-        if (!$posts = Db::getInstance()->executeS($sql)) {
+        if (!$posts = \Db::getInstance()->executeS($sql)) {
             return false;
         }
 
         $i = 0;
         $blogCategory = new BeesBlogCategory();
         foreach ($posts as $post) {
-            $result = array(
+            $result = [
                 'id_post' => $post['id_bees_blog_post'],
                 'viewed' => $post['viewed'],
                 'meta_title' => $post['meta_title'],
@@ -77,8 +88,8 @@ class BeesBlogPostCategory extends BeesBlogObjectModel
                 'id_category' => $post['id_category'],
                 'link_rewrite' => $post['link_rewrite'],
                 'cat_link_rewrite' => $blogCategory->getCatLinkRewrite($post['id_category']),
-            );
-            $employee = new  Employee($post['id_author']);
+            ];
+            $employee = new \Employee($post['id_employee']);
 
             $result['lastname'] = $employee->lastname;
             $result['firstname'] = $employee->firstname;
@@ -88,7 +99,7 @@ class BeesBlogPostCategory extends BeesBlogObjectModel
             } else {
                 $result['post_img'] = 'no';
             }
-            $result['created'] = $post['created'];
+            $result['date_add'] = $post['date_add'];
             $results[$i] = $result;
             $i++;
         }

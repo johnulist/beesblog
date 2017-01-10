@@ -17,6 +17,11 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+require_once dirname(__FILE__).'/../../classes/autoload.php';
+
+use BeesBlogModule\BeesBlogCategory;
+use BeesBlogModule\BeesBlogModuleFrontController;
+use BeesBlogModule\BeesBlogPost;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -34,7 +39,11 @@ class BeesBlogDetailsModuleFrontController extends BeesBlogModuleFrontController
 {
     public $report = '';
 
+    /** @var int $idPost */
     protected $idPost;
+
+    /** @var \BeesBlog $module */
+    public $module;
 
     /**
      * Initialize content
@@ -44,42 +53,39 @@ class BeesBlogDetailsModuleFrontController extends BeesBlogModuleFrontController
     public function initContent()
     {
         parent::initContent();
-        $this->idPost = (int) BeesBlogPost::getIdByRewrite(Tools::getValue('blog_rewrite'));
+        $this->idPost = (int) BeesBlogPost::getIdByRewrite(\Tools::getValue('blog_rewrite'));
 
         if (empty($this->idPost)) {
             return;
 
         }
 
-        $configuration = Configuration::getMultiple(array(
-            'coolshowauthorstyle',
-            'coolshowauthor',
-            'coolcustomcss',
-            'coolshownoimg',
-            'coolshowviewed',
+        $configuration = \Configuration::getMultiple([
+            'beesshowauthorstyle',
+            'beesshowauthor',
+            'beescustomcss',
+            'beesshownoimg',
+            'beesshowviewed',
             'PS_SHOP_NAME',
             'PS_SC_TWITTER',
             'PS_SC_GOOGLE',
             'PS_SC_FACEBOOK',
             'PS_SC_PINTEREST',
-        ));
+        ]);
 
-        $context = Context::getContext();
+        $context = \Context::getContext();
         $link = $context->link;
 
         // TODO: what does the hook name even mean? :S
-        Hook::exec('actionsbsingle', array('id_post' => $this->idPost));
+        \Hook::exec('actionsbsingle', ['id_post' => $this->idPost]);
         $blogPost = new BeesBlogPost();
         $blogCategory = new BeesBlogCategory();
-        $blogComment = new BeesBlogComment();
 
         $idLang = $this->context->language->id;
 
         $post = $blogPost->getRaw($this->idPost, $idLang);
         $tags = $blogPost->getTags($this->idPost);
 
-        $comment = $blogComment->getComment($this->idPost, $idLang);
-        $countcomment = $blogComment->getTotalComments($this->idPost, $idLang);
         $idCategory = $post['id_category'];
         $titleCategory = $blogCategory->getNameCategory($idCategory);
         if (file_exists(_PS_MODULE_DIR_.'beesblog/images/'.(int) $this->idPost.'.jpg')
@@ -91,18 +97,18 @@ class BeesBlogDetailsModuleFrontController extends BeesBlogModuleFrontController
 
         BeesBlogPost::viewed($this->idPost);
 
-        Media::addJsDef(array(
+        \Media::addJsDef([
             'sharing_name' => addcslashes($post['meta_title'], "'"),
-            'sharing_url' => addcslashes(Tools::getHttpHost(true).$_SERVER['REQUEST_URI'], "'"),
-            'sharing_img' => addcslashes(Tools::getHttpHost(true).'/modules/beesblog/images/'.(int) $post['id_post'].'.jpg', "'"),
-        ));
+            'sharing_url' => addcslashes(\Tools::getHttpHost(true).$_SERVER['REQUEST_URI'], "'"),
+            'sharing_img' => addcslashes(\Tools::getHttpHost(true).'/modules/beesblog/images/'.(int) $post['id_post'].'.jpg', "'"),
+        ]);
+
         $this->context->controller->addCss(_PS_MODULE_DIR_.'/socialsharing/socialsharing.css');
         $this->context->controller->addJS(_PS_MODULE_DIR_.'/socialsharing/socialsharing.js');
 
-        $postProperties = array(
-            'blogHome' => $link->getModuleLink('beesblog'),
+        $postProperties = [
+            'blogHome' => \BeesBlog::getBeesBlogLink(),
             'post' => $post,
-            'comments' => $comment,
             'tags' => $tags,
             'titleCategory' => $titleCategory[0]['meta_title'],
             'titlePost' => $post['meta_title'],
@@ -113,17 +119,16 @@ class BeesBlogDetailsModuleFrontController extends BeesBlogModuleFrontController
             'postActive' => $post['active'],
             'content' => $post['content'],
             'idPost' => $post['id_post'],
-            'coolshowauthorstyle' => $configuration['coolshowauthorstyle'],
-            'coolshowauthor' => $configuration['coolshowauthor'],
+            'beesshowauthorstyle' => $configuration['beesshowauthorstyle'],
+            'beesshowauthor' => $configuration['beesshowauthor'],
             'created' => $post['created'],
             'firstname' => $post['firstname'],
             'lastname' => $post['lastname'],
-            'coolcustomcss' => $configuration['coolcustomcss'],
-            'coolshownoimg' => $configuration['coolshownoimg'],
-            'coolshowviewed' => $configuration['coolshowviewed'],
+            'beescustomcss' => $configuration['beescustomcss'],
+            'beesshownoimg' => $configuration['beesshownoimg'],
+            'beesshowviewed' => $configuration['beesshowviewed'],
             'viewed' => $post['viewed'],
             'commentStatus' => $post['comment_status'],
-            'countcomment' => $countcomment,
             'PS_SC_TWITTER' => $configuration['PS_SC_TWITTER'],
             'PS_SC_GOOGLE' => $configuration['PS_SC_GOOGLE'],
             'PS_SC_FACEBOOK' => $configuration['PS_SC_FACEBOOK'],
@@ -131,13 +136,13 @@ class BeesBlogDetailsModuleFrontController extends BeesBlogModuleFrontController
             'postImage' => $postImage,
             'report' => $this->report,
             'idCategory' => $post['id_category'],
-        );
+        ];
 
         // TODO: hmmz, maybe the disqus comments should be hooked instead
         $this->context->smarty->assign($postProperties);
         $this->context->smarty->assign(
             'HOOK_SMART_BLOG_POST_FOOTER',
-            Hook::exec('displaySmartAfterPost', $postProperties)
+            \Hook::exec('displaySmartAfterPost', $postProperties)
         );
         $this->setTemplate('post.tpl');
     }

@@ -17,12 +17,19 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+require_once dirname(__FILE__).'/../../classes/autoload.php';
+
+use BeesBlogModule\BeesBlogCategory;
+use BeesBlogModule\BeesBlogModuleFrontController;
+use BeesBlogModule\BeesBlogPost;
+use BeesBlogModule\BeesBlogPostCategory;
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 require_once _PS_MODULE_DIR_.'beesblog/classes/autoload.php';
+
 if (!class_exists('BeesBlog')) {
     require_once _PS_MODULE_DIR_.'beesblog/beesblog.php';
 }
@@ -32,7 +39,10 @@ if (!class_exists('BeesBlog')) {
  */
 class BeesBlogCategoryModuleFrontController extends BeesBlogModuleFrontController
 {
+    /** @var BeesBlogCategory $beesblogCategory */
     public $beesblogCategory;
+
+    /** @var int $idCategory */
     public $idCategory;
 
     /**
@@ -42,15 +52,15 @@ class BeesBlogCategoryModuleFrontController extends BeesBlogModuleFrontControlle
     {
         parent::initContent();
 
-        $configuration = Configuration::getMultiple(array(
-            BeesBlog::POSTS_PER_PAGE,
-            BeesBlog::SHOW_AUTHOR,
-            BeesBlog::SHOW_AUTHOR_STYLE,
-            BeesBlog::CUSTOM_CSS,
-            BeesBlog::SHOW_NO_IMAGE,
-            BeesBlog::DISABLE_CATEGORY_IMAGE,
-            BeesBlog::SHOW_VIEWED,
-        ));
+        $configuration = \Configuration::getMultiple([
+            \BeesBlog::POSTS_PER_PAGE,
+            \BeesBlog::SHOW_AUTHOR,
+            \BeesBlog::SHOW_AUTHOR_STYLE,
+            \BeesBlog::CUSTOM_CSS,
+            \BeesBlog::SHOW_NO_IMAGE,
+            \BeesBlog::DISABLE_CATEGORY_IMAGE,
+            \BeesBlog::SHOW_VIEWED,
+        ]);
 
         $categoryStatus = '';
         $totalPages = '';
@@ -61,24 +71,27 @@ class BeesBlogCategoryModuleFrontController extends BeesBlogModuleFrontControlle
         $blogPost = new BeesBlogPost();
         $blogCategory = new BeesBlogCategory();
         $blogPostCategory = new BeesBlogPostCategory();
-        $postsPerPage = $configuration[BeesBlog::POSTS_PER_PAGE];
+        $postsPerPage = $configuration[\BeesBlog::POSTS_PER_PAGE];
         $limitStart = 0;
         $limit = $postsPerPage;
-        if (!$this->idCategory = BeesBlogCategory::getIdByRewrite(Tools::getValue('cat_rewrite'))) {
+
+        if (!$this->idCategory = BeesBlogCategory::getIdByRewrite(\Tools::getValue('cat_rewrite'))) {
             $total = $blogPost->getPostCount($this->context->language->id);
         } else {
             $total = $blogPost->getPostCountByCategory($this->context->language->id, $this->idCategory);
-            Hook::exec('actionsbcat', array('id_category' => (int) $this->idCategory));
+            \Hook::exec('actionsbcat', ['id_category' => (int) $this->idCategory]);
         }
+
         if ($total != '' || $total != 0) {
             $totalPages = ceil($total / $postsPerPage);
         }
-        if ((bool) Tools::getValue('page')) {
-            $c = Tools::getValue('page');
+
+        if ((bool) \Tools::getValue('page')) {
+            $c = \Tools::getValue('page');
             $limitStart = $postsPerPage * ($c - 1);
         }
         if (!$this->idCategory) {
-            $allNews = $blogPost->getAllPost($this->context->language->id, $limitStart, $limit);
+            $allNews = $blogPost->getAllPosts($this->context->language->id, $limitStart, $limit);
         } else {
             if (file_exists(_PS_MODULE_DIR_.'beesblog/images/category/'.$this->idCategory.'.jpg')
                 || file_exists(_PS_MODULE_DIR_.'beesblog/images/category/'.$this->idCategory.'.png')) {
@@ -104,30 +117,30 @@ class BeesBlogCategoryModuleFrontController extends BeesBlogModuleFrontControlle
 
         // FIXME: $allNews might not have been defined
         // TODO: Change title separator
-        $this->context->smarty->assign(array(
-            'postcategory' => $allNews,
+        $this->context->smarty->assign([
+            'postcategory' => isset($allNews) ? $allNews : '',
             'category_status' => $categoryStatus,
             'title_category' => $titleCategory,
-            'meta_title' => (empty($titleCategory) ? 'Blog' : $titleCategory).' • '.Configuration::get('PS_SHOP_NAME'),
+            'meta_title' => (empty($titleCategory) ? 'Blog' : $titleCategory).' • '.\Configuration::get('PS_SHOP_NAME'),
             'cat_link_rewrite' => $categoryLinkRewrite,
             'id_category' => $this->idCategory,
             'cat_image' => $categoryImage,
             'categoryinfo' => $categoryinfo,
-            'coolshowauthorstyle' => $configuration[BeesBlog::SHOW_AUTHOR_STYLE],
-            'coolshowauthor' => $configuration[BeesBlog::SHOW_AUTHOR],
+            'beesshowauthorstyle' => $configuration[\BeesBlog::SHOW_AUTHOR_STYLE],
+            'beesshowauthor' => $configuration[\BeesBlog::SHOW_AUTHOR],
             'limit' => isset($limit) ? $limit : 0,
             'limit_start' => isset($limitStart) ? $limitStart : 0,
             'c' => isset($c) ? $c : 1,
             'total' => $total,
-            'beesblogliststyle' => Configuration::get('beesblogliststyle'),
-            'coolcustomcss' => $configuration[BeesBlog::CUSTOM_CSS],
-            'coolshownoimg' => $configuration[BeesBlog::SHOW_NO_IMAGE],
-            'cooldisablecatimg' => $configuration[BeesBlog::DISABLE_CATEGORY_IMAGE],
-            'coolshowviewed' => $configuration[BeesBlog::SHOW_VIEWED],
+            'beesblogliststyle' => \Configuration::get('beesblogliststyle'),
+            'beescustomcss' => $configuration[\BeesBlog::CUSTOM_CSS],
+            'beesshownoimg' => $configuration[\BeesBlog::SHOW_NO_IMAGE],
+            'beesdisablecatimg' => $configuration[\BeesBlog::DISABLE_CATEGORY_IMAGE],
+            'beesshowviewed' => $configuration[\BeesBlog::SHOW_VIEWED],
             'post_per_page' => $postsPerPage,
             'pagenums' => $totalPages - 1,
             'totalpages' => $totalPages,
-        ));
+        ]);
 
         $templateName = 'postcategory.tpl';
 

@@ -17,9 +17,17 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 spl_autoload_register(
     function ($className) {
+        if (strpos($className, 'BeesBlogModule\\') === false) {
+            return false;
+        }
+
+        $className = str_replace('BeesBlogModule\\', '', $className);
         if (file_exists(dirname(__FILE__).'/'.$className.'.php')) {
             require_once $className.'.php';
 

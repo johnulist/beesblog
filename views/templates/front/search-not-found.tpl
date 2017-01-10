@@ -27,7 +27,7 @@
 				<fieldset>
 					<div>
 						<input type="hidden" value="0" name="beesblogaction">
-						<input type="text" class="form-control grey" value="{$coolsearch}" name="coolsearch" id="search_query">
+						<input type="text" class="form-control grey" value="{$beessearch}" name="beessearch" id="search_query">
 						<button class="btn btn-default button button-small" value="OK" name="beesblogsubmit" type="submit">
 							<span>{l s="Ok" mod="beesblog"}</span>
 						</button>

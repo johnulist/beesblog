@@ -17,14 +17,13 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+require_once dirname(__FILE__).'/../../classes/autoload.php';
+
+use BeesBlogModule\BeesBlogModuleFrontController;
+use BeesBlogModule\BeesBlogPost;
 
 if (!defined('_PS_VERSION_')) {
     exit;
-}
-
-require_once _PS_MODULE_DIR_.'beesblog/classes/autoload.php';
-if (!class_exists('BeesBlog')) {
-    require_once _PS_MODULE_DIR_.'beesblog/beesblog.php';
 }
 
 /**
@@ -39,45 +38,47 @@ class BeesBlogarchiveModuleFrontController extends BeesBlogModuleFrontController
     {
         parent::initContent();
 
-        $configuration = Configuration::getMultiple(array(
-            BeesBlog::SHOW_AUTHOR_STYLE,
-            BeesBlog::SHOW_VIEWED,
-            BeesBlog::SHOW_NO_IMAGE,
-            BeesBlog::SHOW_AUTHOR,
-            BeesBlog::POSTS_PER_PAGE,
-        ));
+        $configuration = \Configuration::getMultiple([
+            \BeesBlog::SHOW_AUTHOR_STYLE,
+            \BeesBlog::SHOW_VIEWED,
+            \BeesBlog::SHOW_NO_IMAGE,
+            \BeesBlog::SHOW_AUTHOR,
+            \BeesBlog::POSTS_PER_PAGE,
+        ]);
 
-        $year = Tools::getValue('year');
-        $month = Tools::getValue('month');
+        $year = \Tools::getValue('year');
+        $month = \Tools::getValue('month');
         $titleCategory = '';
-        $postsPerPage = $configuration[BeesBlog::POSTS_PER_PAGE];
+        $postsPerPage = $configuration[\BeesBlog::POSTS_PER_PAGE];
         $limitStart = 0;
         $limit = $postsPerPage;
-        if ((bool) Tools::getValue('page')) {
-            $c = (int) Tools::getValue('page');
+        if ((bool) \Tools::getValue('page')) {
+            $c = (int) \Tools::getValue('page');
             $limitStart = $postsPerPage * ($c - 1);
         }
         $result = BeesBlogPost::getArchiveResult($month, $year, $limitStart, $limit);
         $total = count($result);
         $totalpages = ceil($total / $postsPerPage);
 
-        $this->context->smarty->assign(array(
+        $this->context->smarty->assign(
+            [
             'postcategory' => $result,
             'title_category' => $titleCategory,
-            'coolshowauthorstyle' => $configuration[BeesBlog::SHOW_AUTHOR_STYLE],
+            'beesshowauthorstyle' => $configuration[\BeesBlog::SHOW_AUTHOR_STYLE],
             'limit' => isset($limit) ? $limit : 0,
             'limit_start' => isset($limitStart) ? $limitStart : 0,
             'c' => isset($c) ? $c : 1,
             'total' => $total,
-            'coolshowviewed' => $configuration[BeesBlog::SHOW_VIEWED],
-            'coolcustomcss' => $configuration[BeesBlog::CUSTOM_CSS],
-            'coolshownoimg' => $configuration[BeesBlog::SHOW_NO_IMAGE],
-            'coolshowauthor' => $configuration[BeesBlog::SHOW_AUTHOR],
+            'beesshowviewed' => $configuration[\BeesBlog::SHOW_VIEWED],
+            'beescustomcss' => $configuration[\BeesBlog::CUSTOM_CSS],
+            'beesshownoimg' => $configuration[\BeesBlog::SHOW_NO_IMAGE],
+            'beesshowauthor' => $configuration[\BeesBlog::SHOW_AUTHOR],
             'post_per_page' => $postsPerPage,
             'pagenums' => $totalpages - 1,
-            'beesblogliststyle' => Configuration::get('beesblogliststyle'),
+            'beesblogliststyle' => \Configuration::get('beesblogliststyle'),
             'totalpages' => $totalpages,
-        ));
+            ]
+        );
 
         $templateName = 'archivecategory.tpl';
         $this->setTemplate($templateName);

@@ -30,13 +30,13 @@
 			{* TODO: remove assign from template *}
 			{assign var="catOptions" value=null}
 			{$catOptions.id_category = $id_category}
-			{$catOptions.slug = $cat_link_rewrite}
+			{$catoptions.url_key = $cat_link_rewrite}
 			<span>
 				{l s='Posted by ' mod='beesblog'}
-				{if $coolshowauthor ==1}
+				{if $beesshowauthor ==1}
 					<i class="icon icon-user"></i>
 					<span itemprop="author">
-						{if $coolshowauthorstyle != 0}
+						{if $beesshowauthorstyle != 0}
 							{$firstname|escape:'htmlall':'UTF-8'} {$lastname|escape:'htmlall':'UTF-8'}
 						{else}
 							{$lastname|escape:'htmlall':'UTF-8'} {$firstname|escape:'htmlall':'UTF-8'}
@@ -59,7 +59,7 @@
 		<div itemprop="articleBody">
 			<div id="lipsum" class="articleContent">
 				{assign var="activeimgincat" value='0'}
-				{$activeimgincat = $coolshownoimg}
+				{$activeimgincat = $beesshownoimg}
 				{if ($post_img != "no" && $activeimgincat == 0) || $activeimgincat == 1}
 					<a id="post_images" href="{$modules_dir|escape:'htmlall':'UTF-8'}/beesblog/images/{$post_img|escape:'htmlall':'UTF-8'}-single-default.jpg">
 						<img src="{$modules_dir|escape:'htmlall':'UTF-8'}/beesblog/images/{$post_img|escape:'htmlall':'UTF-8'}-single-default.jpg" alt="{$title_post|escape:'htmlall':'UTF-8'}">

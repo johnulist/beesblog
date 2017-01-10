@@ -17,6 +17,8 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+namespace BeesBlogModule;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -24,7 +26,7 @@ if (!defined('_PS_VERSION_')) {
 /**
  * Class BeesBlogModuleFrontController
  */
-class BeesBlogModuleFrontController extends ModuleFrontController
+class BeesBlogModuleFrontController extends \ModuleFrontController
 {
     /**
      * Initialize content
@@ -35,38 +37,46 @@ class BeesBlogModuleFrontController extends ModuleFrontController
         parent::initContent();
         $idCategory = 0;
         $idPost = 0;
-        if (Tools::isSubmit('blog_rewrite') && $idCategory = BeesBlogCategory::getIdByRewrite(Tools::getValue('blog_rewrite'))) {
+        $this->context->smarty->assign('blogHome', \BeesBlog::getBeesBlogLink());
+        if (\Tools::isSubmit(\BeesBlog::BLOG_REWRITE) && $idCategory = BeesBlogCategory::getIdByRewrite(\Tools::getValue(\BeesBlog::BLOG_REWRITE))) {
             $this->context->smarty->assign(BeesBlogCategory::getCategoryMeta((int) $idCategory));
         }
-        if (Tools::isSubmit('blog_rewrite') && $idPost = BeesBlogPost::getIdByRewrite(Tools::getValue('blog_rewrite'))) {
+        if (\Tools::isSubmit(\BeesBlog::BLOG_REWRITE) && $idPost = BeesBlogPost::getIdByRewrite(\Tools::getValue(\BeesBlog::BLOG_REWRITE))) {
             $this->context->smarty->assign(BeesBlogPost::getMeta((int) $idPost));
         }
         if (empty($idCategory) && empty($idPost)) {
-            $meta['meta_title'] = Configuration::get('beesblogmetatitle');
-            $meta['meta_description'] = Configuration::get('beesblogmetadescrip');
-            $meta['meta_keywords'] = Configuration::get('beesblogmetakeyword');
+            $meta['meta_title'] = \Configuration::get(\BeesBlog::META_TITLE);
+            $meta['meta_description'] = \Configuration::get(\BeesBlog::META_DESCRIPTION);
+            $meta['meta_keywords'] = \Configuration::get(\BeesBlog::META_KEYWORDS);
             $this->context->smarty->assign($meta);
         }
-        if (Configuration::get('coolshowcolumn') == 0) {
-            $this->context->smarty->assign(array(
-                'HOOK_LEFT_COLUMN' => Hook::exec('displayBeesBlogLeft'),
-                'HOOK_RIGHT_COLUMN' => Hook::exec('displayBeesBlogRight'),
-            ));
-        } elseif (Configuration::get('coolshowcolumn') == 1) {
-            $this->context->smarty->assign(array(
-                'HOOK_LEFT_COLUMN' => Hook::exec('displayBeesBlogLeft'),
-            ));
-        } elseif (Configuration::get('coolshowcolumn') == 2) {
-            $this->context->smarty->assign(array(
-                'HOOK_RIGHT_COLUMN' => Hook::exec('displayBeesBlogRight'),
-            ));
-        } elseif (Configuration::get('coolshowcolumn') == 3) {
-            $this->context->smarty->assign(array());
-        } else {
-            $this->context->smarty->assign(array(
-                'HOOK_LEFT_COLUMN' => Hook::exec('displayBeesBlogLeft'),
-                'HOOK_RIGHT_COLUMN' => Hook::exec('displayBeesBlogRight'),
-            ));
+
+        switch (\Configuration::get(\BeesBlog::SHOW_COLUMN)) {
+            case 0:
+                $this->context->smarty->assign([
+                    'HOOK_LEFT_COLUMN' => \Hook::exec('displayBeesBlogLeft'),
+                    'HOOK_RIGHT_COLUMN' => \Hook::exec('displayBeesBlogRight'),
+                ]);
+                break;
+            case 1:
+                $this->context->smarty->assign([
+                    'HOOK_LEFT_COLUMN' => \Hook::exec('displayBeesBlogLeft'),
+                ]);
+                break;
+            case 2:
+                $this->context->smarty->assign([
+                    'HOOK_RIGHT_COLUMN' => \Hook::exec('displayBeesBlogRight'),
+                ]);
+                break;
+            case 3:
+                $this->context->smarty->assign([]);
+                break;
+            default:
+                $this->context->smarty->assign([
+                    'HOOK_LEFT_COLUMN' => \Hook::exec('displayBeesBlogLeft'),
+                    'HOOK_RIGHT_COLUMN' => \Hook::exec('displayBeesBlogRight'),
+                ]);
+                break;
         }
     }
 }

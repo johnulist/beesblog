@@ -32,8 +32,8 @@
 		{/foreach}
 	</div>
 {/if}
-{if isset($coolcustomcss)}
+{if isset($beescustomcss)}
 	<style>
-		{$coolcustomcss|escape:'htmlall':'UTF-8'}
+		{$beescustomcss|escape:'htmlall':'UTF-8'}
 	</style>
 {/if}

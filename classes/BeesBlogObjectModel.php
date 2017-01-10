@@ -17,6 +17,8 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+namespace BeesBlogModule;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -24,7 +26,7 @@ if (!defined('_PS_VERSION_')) {
 /**
  * Class BeesBlogObjectModel
  */
-class BeesBlogObjectModel extends ObjectModel
+class BeesBlogObjectModel extends \ObjectModel
 {
     /**
      *  Create the database table with its columns. Similar to the createColumn() method.
@@ -45,7 +47,7 @@ class BeesBlogObjectModel extends ObjectModel
         $sql = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.bqSQL($definition['table']).'` (';
         $sql .= '`'.$definition['primary'].'` INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,';
         foreach ($definition['fields'] as $fieldName => $field) {
-            if ($fieldName === $definition['primary']) {
+            if ($fieldName === $definition['primary'] || (isset($field['lang']) && $field['lang'])) {
                 continue;
             }
             $sql .= '`'.$fieldName.'` '.$field['db_type'];
@@ -61,8 +63,8 @@ class BeesBlogObjectModel extends ObjectModel
         $sql .= ')';
 
         try {
-            $success &= Db::getInstance()->execute($sql);
-        } catch (PrestaShopDatabaseException $exception) {
+            $success &= \Db::getInstance()->execute($sql);
+        } catch (\PrestaShopDatabaseException $exception) {
             self::dropDatabase($className);
 
             return false;
@@ -88,15 +90,19 @@ class BeesBlogObjectModel extends ObjectModel
 
             // Lang field
             $sql .= '`id_lang` INT(11) DEFAULT NULL,';
+            if (isset($definition['multilang_shop']) && $definition['multilang_shop']) {
+                $sql .= '`id_shop` INT(11) DEFAULT NULL,';
+            }
 
             // Primary key
             $sql .= 'PRIMARY KEY (`'.bqSQL($definition['primary']).'`, `id_lang`)';
 
+
             $sql .= ')';
 
             try {
-                $success &= Db::getInstance()->execute($sql);
-            } catch (PrestaShopDatabaseException $exception) {
+                $success &= \Db::getInstance()->execute($sql);
+            } catch (\PrestaShopDatabaseException $exception) {
                 self::dropDatabase($className);
 
                 return false;
@@ -130,8 +136,8 @@ class BeesBlogObjectModel extends ObjectModel
             $sql .= ')';
 
             try {
-                $success &= Db::getInstance()->execute($sql);
-            } catch (PrestaShopDatabaseException $exception) {
+                $success &= \Db::getInstance()->execute($sql);
+            } catch (\PrestaShopDatabaseException $exception) {
                 self::dropDatabase($className);
 
                 return false;
@@ -155,18 +161,18 @@ class BeesBlogObjectModel extends ObjectModel
             $className = get_called_class();
         }
 
-        $definition = ObjectModel::getDefinition($className);
+        $definition = \ObjectModel::getDefinition($className);
 
-        $success &= Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.bqSQL($definition['table']).'`');
+        $success &= \Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.bqSQL($definition['table']).'`');
 
         if (isset($definition['multilang']) && $definition['multilang']
             || isset($definition['multilang_shop']) && $definition['multilang_shop']) {
-            $success &= Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.bqSQL($definition['table']).'_lang`');
+            $success &= \Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.bqSQL($definition['table']).'_lang`');
         }
 
         if (isset($definition['multishop']) && $definition['multishop']
             || isset($definition['multilang_shop']) && $definition['multilang_shop']) {
-            $success &= Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.bqSQL($definition['table']).'_shop`');
+            $success &= \Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.bqSQL($definition['table']).'_shop`');
         }
 
         return $success;
@@ -177,7 +183,7 @@ class BeesBlogObjectModel extends ObjectModel
      *
      * @param string|null $className Class name
      *
-     * @return array|false|mysqli_result|null|PDOStatement|resource
+     * @return array|false|\mysqli_result|null|\PDOStatement|resource
      */
     public static function getDatabaseColumns($className = null)
     {
@@ -185,10 +191,10 @@ class BeesBlogObjectModel extends ObjectModel
             $className = get_called_class();
         }
 
-        $definition = ObjectModel::getDefinition($className);
+        $definition = \ObjectModel::getDefinition($className);
         $sql = 'SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=\''._DB_NAME_.'\' AND TABLE_NAME=\''._DB_PREFIX_.pSQL($definition['table']).'\'';
 
-        return Db::getInstance()->executeS($sql);
+        return \Db::getInstance()->executeS($sql);
     }
 
     /**
@@ -209,14 +215,14 @@ class BeesBlogObjectModel extends ObjectModel
      *     ),
      * ),
      *
-     * The primary column is created automatically as INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT. The other columns
+     * The primary column is date_add automatically as INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT. The other columns
      * require an extra parameter, with the type of the column in the database.
      *
      * @param string      $name             Column name
      * @param string      $columnDefinition Column type definition
      * @param string|null $className        Class name
      *
-     * @return bool Indicates whether the column was successfully created
+     * @return bool Indicates whether the column was successfully date_add
      */
     public static function createColumn($name, $columnDefinition, $className = null)
     {
@@ -238,7 +244,7 @@ class BeesBlogObjectModel extends ObjectModel
             }
         }
 
-        return (bool) Db::getInstance()->execute($sql);
+        return (bool) \Db::getInstance()->execute($sql);
     }
 
     /**
@@ -247,7 +253,7 @@ class BeesBlogObjectModel extends ObjectModel
      *
      * @param string|null $className Class name
      *
-     * @return bool Indicates whether the missing columns were successfully created
+     * @return bool Indicates whether the missing columns were successfully date_add
      *
      * @todo: Support multishop and multilang
      */

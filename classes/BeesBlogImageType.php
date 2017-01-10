@@ -17,6 +17,8 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+namespace BeesBlogModule;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -26,6 +28,7 @@ if (!defined('_PS_VERSION_')) {
  */
 class BeesBlogImageType extends BeesBlogObjectModel
 {
+    // @codingStandardsIgnoreStart
     /** @var string $type_name */
     public $type_name;
 
@@ -40,46 +43,50 @@ class BeesBlogImageType extends BeesBlogObjectModel
 
     /** @var bool $active */
     public $active;
+    // @codingStandardsIgnoreEnd
 
-    public static $definition = array(
-        'table' => 'bees_blog_imagetype',
-        'primary' => 'id_bees_blog_imagetype',
-        'fields' => array(
-            'width' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true, 'db_type' => 'INT(11) UNSIGNED'),
-            'height' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true, 'db_type' => 'INT(11) UNSIGNED'),
-            'type_name' => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => true, 'db_type' => 'VARCHAR(45)'),
-            'type' => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => true, 'db_type' => 'VARCHAR(45)'),
-            'active' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'required' => true, 'default' => '1', 'db_type' => 'TINYINT(1)'),
-        ),
-    );
+    const PRIMARY = 'id_bees_blog_imagetype';
+    const TABLE = 'bees_blog_imagetype';
+
+    public static $definition = [
+        'table' => self::TABLE,
+        'primary' => self::PRIMARY,
+        'fields' => [
+            'width' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true, 'db_type' => 'INT(11) UNSIGNED'],
+            'height' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true, 'db_type' => 'INT(11) UNSIGNED'],
+            'type_name' => ['type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => true, 'db_type' => 'VARCHAR(45)'],
+            'type' => ['type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => true, 'db_type' => 'VARCHAR(45)'],
+            'active' => ['type' => self::TYPE_BOOL, 'validate' => 'isBool', 'required' => true, 'default' => '1', 'db_type' => 'TINYINT(1)'],
+        ],
+    ];
 
     /**
      * @param string $type
      *
-     * @return array|false|mysqli_result|null|PDOStatement|resource
+     * @return array|false|\mysqli_result|null|\PDOStatement|resource
      */
     public static function getAllImagesFromType($type)
     {
-        $sql = new DbQuery();
+        $sql = new \DbQuery();
         $sql->select('*');
-        $sql->from('bees_blog_imagetype');
+        $sql->from(self::TABLE);
         $sql->where('`active` = 1');
         $sql->where('`type` = \''.pSQL($type).'\'');
-        $imageType = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+        $imageType = \Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
 
         return $imageType;
     }
 
     /**
-     * @return array|false|mysqli_result|null|PDOStatement|resource
+     * @return array|false|\mysqli_result|null|\PDOStatement|resource
      */
     public static function getAllImageTypes()
     {
-        $sql = new DbQuery();
+        $sql = new \DbQuery();
         $sql->select('*');
-        $sql->from('bees_blog_imagetype');
+        $sql->from(self::TABLE);
         $sql->where('`active` = 1');
-        $imageTypes = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+        $imageTypes = \Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
 
         return $imageTypes;
     }
@@ -87,16 +94,16 @@ class BeesBlogImageType extends BeesBlogObjectModel
     /**
      * @param string $type
      *
-     * @return array|false|mysqli_result|null|PDOStatement|resource
+     * @return array|false|\mysqli_result|null|\PDOStatement|resource
      */
     public static function getImageByType($type)
     {
-        $sql = new DbQuery();
+        $sql = new \DbQuery();
         $sql->select('*');
-        $sql->from('bees_blog_imagetype');
+        $sql->from(self::TABLE);
         $sql->where('`active` = 1');
         $sql->where('`type_name` = \''.pSQL($type).'\'');
-        $imageType = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+        $imageType = \Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
 
         return $imageType;
     }
@@ -116,7 +123,7 @@ class BeesBlogImageType extends BeesBlogObjectModel
         foreach ($categoryTypes as $imageType) {
             foreach ($getCategoryImage as $categoryImage) {
                 $path = _PS_MODULE_DIR_.'beesblog/images/category/'.$categoryImage['id_bees_blog_category'].'.jpg';
-                ImageManager::resize(
+                \ImageManager::resize(
                     $path,
                     _PS_MODULE_DIR_.'beesblog/images/category/'.$categoryImage['id_bees_blog_category'].'-'.stripslashes($imageType['type_name']).'.jpg',
                     (int) $imageType['width'],
@@ -127,7 +134,7 @@ class BeesBlogImageType extends BeesBlogObjectModel
         foreach ($postTypes as $imageType) {
             foreach ($getBlogImage as $blogImage) {
                 $path = _PS_MODULE_DIR_.'beesblog/images/'.$blogImage['id_bees_blog_post'].'.jpg';
-                ImageManager::resize(
+                \ImageManager::resize(
                     $path,
                     _PS_MODULE_DIR_.'beesblog/images/'.$blogImage['id_bees_blog_post'].'-'.stripslashes($imageType['type_name']).'.jpg',
                     (int) $imageType['width'],
@@ -136,7 +143,7 @@ class BeesBlogImageType extends BeesBlogObjectModel
             }
         }
         foreach ($authorTypes as $authorType) {
-            ImageManager::resize(
+            \ImageManager::resize(
                 $getAuthorImage,
                 _PS_MODULE_DIR_.'beesblog/images/avatar/avatar-'.stripslashes($authorType['type_name']).'.jpg',
                 (int) $authorType['width'],

@@ -17,14 +17,13 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+require_once dirname(__FILE__).'/../../classes/autoload.php';
+
+use BeesBlogModule\BeesBlogModuleFrontController;
+use BeesBlogModule\BeesBlogPost;
 
 if (!defined('_PS_VERSION_')) {
     exit;
-}
-
-require_once _PS_MODULE_DIR_.'beesblog/classes/autoload.php';
-if (!class_exists('BeesBlog')) {
-    require_once _PS_MODULE_DIR_.'beesblog/beesblog.php';
 }
 
 /**
@@ -39,66 +38,47 @@ class BeesBlogtagpostModuleFrontController extends BeesBlogModuleFrontController
     {
         parent::initContent();
 
-        $configuration = Configuration::getMultiple(array(
-            BeesBlog::POSTS_PER_PAGE,
-            BeesBlog::SHOW_AUTHOR,
-            BeesBlog::SHOW_AUTHOR_STYLE,
-            BeesBlog::CUSTOM_CSS,
-            BeesBlog::SHOW_NO_IMAGE,
-        ));
+        $configuration = \Configuration::getMultiple([
+            \BeesBlog::POSTS_PER_PAGE,
+            \BeesBlog::SHOW_AUTHOR,
+            \BeesBlog::SHOW_AUTHOR_STYLE,
+            \BeesBlog::CUSTOM_CSS,
+            \BeesBlog::SHOW_NO_IMAGE,
+        ]);
 
-        $blogcomment = new BeesBlogComment();
         $titleCategory = '';
-        $postsPerPage = $configuration[BeesBlog::POSTS_PER_PAGE];
+        $postsPerPage = $configuration[\BeesBlog::POSTS_PER_PAGE];
         $limitStart = 0;
         $limit = $postsPerPage;
 
-        if ((bool) Tools::getValue('page')) {
-            $c = (int) Tools::getValue('page');
+        if ((bool) \Tools::getValue('page')) {
+            $c = (int) \Tools::getValue('page');
             $limitStart = $postsPerPage * ($c - 1);
         }
 
-        $keyword = urldecode(Tools::getValue('tag'));
+        $keyword = urldecode(\Tools::getValue('tag'));
         $idLang = (int) $this->context->language->id;
         $result = BeesBlogPost::tagsPost($keyword, $idLang);
         $total = count($result);
         $totalpages = ceil($total / $postsPerPage);
-        $i = 0;
-        if (!empty($result)) {
-            foreach ($result as $item) {
-                $to[$i] = $blogcomment->getTotalComments($item['id_post']);
-                $i++;
-            }
-            $j = 0;
-            if (isset($to)) {
-                foreach ($to as $item) {
-                    if ($item == '') {
-                        $result[$j]['totalcomment'] = 0;
-                    } else {
-                        $result[$j]['totalcomment'] = $item;
-                    }
-                    $j++;
-                }
-            }
-        }
 
-        $this->context->smarty->assign(array(
+        $this->context->smarty->assign([
             'postcategory' => $result,
             'title_category' => $titleCategory,
-            'coolshowauthorstyle' => $configuration[BeesBlog::SHOW_AUTHOR_STYLE],
+            'beesshowauthorstyle' => $configuration[\BeesBlog::SHOW_AUTHOR_STYLE],
             'limit' => isset($limit) ? $limit : 0,
             'limit_start' => isset($limitStart) ? $limitStart : 0,
             'c' => isset($c) ? $c : 1,
             'total' => $total,
-            'coolshowviewed' => $configuration[BeesBlog::SHOW_VIEWED],
-            'coolcustomcss' => $configuration[BeesBlog::CUSTOM_CSS],
-            'coolshownoimg' => $configuration[BeesBlog::SHOW_NO_IMAGE],
-            'coolshowauthor' => $configuration[BeesBlog::SHOW_AUTHOR],
-            'beesblogliststyle' => Configuration::get('beesblogliststyle'),
+            'beesshowviewed' => $configuration[\BeesBlog::SHOW_VIEWED],
+            'beescustomcss' => $configuration[\BeesBlog::CUSTOM_CSS],
+            'beesshownoimg' => $configuration[\BeesBlog::SHOW_NO_IMAGE],
+            'beesshowauthor' => $configuration[\BeesBlog::SHOW_AUTHOR],
+            'beesblogliststyle' => \Configuration::get('beesblogliststyle'),
             'post_per_page' => $postsPerPage,
             'pagenums' => $totalpages - 1,
             'totalpages' => $totalpages,
-        ));
+        ]);
 
         $templateName = 'tagresult.tpl';
 

@@ -17,7 +17,6 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-
 /**
  * Class AdminBeesBlogImageTypeController
  */
@@ -34,138 +33,138 @@ class AdminBeesBlogImageTypeController extends ModuleAdminController
         $this->lang = false;
         $this->context = Context::getContext();
         $this->bootstrap = true;
-        $this->fields_list = array(
-            'id_bees_blog_imagetype' => array(
+        $this->fields_list = [
+            'id_bees_blog_imagetype' => [
                 'title' => $this->l('Id'),
                 'width' => 100,
                 'type' => 'text',
-            ),
-            'type_name' => array(
+            ],
+            'type_name' => [
                 'title' => $this->l('Type Name'),
                 'width' => 350,
                 'type' => 'text',
-            ),
-            'width' => array(
+            ],
+            'width' => [
                 'title' => $this->l('Width'),
                 'width' => 60,
                 'type' => 'text',
-            ),
-            'height' => array(
+            ],
+            'height' => [
                 'title' => $this->l('Height'),
                 'width' => 60,
                 'type' => 'text',
-            ),
-            'type' => array(
+            ],
+            'type' => [
                 'title' => $this->l('Type'),
                 'width' => 220,
                 'type' => 'text',
-            ),
-            'active' => array(
+            ],
+            'active' => [
                 'title' => $this->l('Status'),
                 'width' => 60,
                 'align' => 'center',
                 'active' => 'status',
                 'type' => 'bool',
                 'orderby' => false,
-            ),
-        );
+            ],
+        ];
         parent::__construct();
     }
 
     /**
      * Render form
      *
-     * @return string|void
+     * @return string
      */
     public function renderForm()
     {
-        $this->fields_form = array(
-            'legend' => array(
+        $this->fields_form = [
+            'legend' => [
                 'title' => $this->l('Blog Category'),
-            ),
-            'input' => array(
-                array(
+            ],
+            'input' => [
+                [
                     'type' => 'text',
                     'label' => $this->l('Image Type Name'),
                     'name' => 'type_name',
                     'size' => 60,
                     'required' => true,
                     'desc' => $this->l('Enter Your Image Type Name Here'),
-                ),
-                array(
+                ],
+                [
                     'type' => 'text',
                     'label' => $this->l('width'),
                     'name' => 'width',
                     'size' => 15,
                     'required' => true,
                     'desc' => $this->l('Image height in px'),
-                ),
-                array(
+                ],
+                [
                     'type' => 'text',
                     'label' => $this->l('Height'),
                     'name' => 'height',
                     'size' => 15,
                     'required' => true,
                     'desc' => $this->l('Image height in px'),
-                ),
-                array(
+                ],
+                [
                     'type' => 'select',
                     'label' => $this->l('Type'),
                     'name' => 'type',
                     'required' => true,
-                    'options' => array(
-                        'query' => array(
-                            array(
+                    'options' => [
+                        'query' => [
+                            [
                                 'id_option' => 'post',
                                 'name' => 'Post',
-                            ),
-                            array(
+                            ],
+                            [
                                 'id_option' => 'Category',
                                 'name' => 'category',
-                            ),
-                            array(
+                            ],
+                            [
                                 'id_option' => 'Author',
                                 'name' => 'author',
-                            ),
-                        ),
+                            ],
+                        ],
                         'id' => 'id_option',
                         'name' => 'name',
-                    ),
-                ),
-                array(
+                    ],
+                ],
+                [
                     'type' => 'radio',
                     'label' => $this->l('Status'),
                     'name' => 'active',
                     'required' => false,
                     'class' => 't',
                     'is_bool' => true,
-                    'values' => array(
-                        array(
+                    'values' => [
+                        [
                             'id' => 'active',
                             'value' => 1,
                             'label' => $this->l('Enabled'),
-                        ),
-                        array(
+                        ],
+                        [
                             'id' => 'active',
                             'value' => 0,
                             'label' => $this->l('Disabled'),
-                        ),
-                    ),
-                ),
-            ),
-            'submit' => array(
+                        ],
+                    ],
+                ],
+            ],
+            'submit' => [
                 'title' => $this->l('Save'),
-            ),
-        );
+            ],
+        ];
 
         if (!($blogImageType = $this->loadObject(true))) {
-            return;
+            return null;
         }
 
-        $this->fields_form['submit'] = array(
+        $this->fields_form['submit'] = [
             'title' => $this->l('Save'),
             'class' => 'button',
-        );
+        ];
 
         return parent::renderForm();
     }

@@ -17,6 +17,8 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+namespace BeesBlogModule;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -26,21 +28,25 @@ if (!defined('_PS_VERSION_')) {
  */
 class BeesBlogTag extends BeesBlogObjectModel
 {
+    // @codingStandardsIgnoreStart
     /** @var int $id_tag */
     public $id_tag;
 
     /** @var string $name */
     public $name;
+    // @codingStandardsIgnoreEnd
 
-    public static $definition = array(
-        'table' => 'bees_blog_tag',
-        'primary' => 'id_tag',
+    const PRIMARY = 'id_bees_blog_tag';
+    const TABLE = 'bees_blog_tag';
+
+    public static $definition = [
+        'table' => self::TABLE,
+        'primary' => self::PRIMARY,
         'multilang' => true,
-        'fields' => array(
-            'id_tag' => array('type' => self::TYPE_BOOL, 'validate' => 'isunsignedInt', 'required' => true, 'db_type' => 'INT(11) UNSIGNED'),
-            'name' => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'lang' => true, 'required' => true, 'db_type' => 'VARCHAR(255)'),
-        ),
-    );
+        'fields' => [
+            'name' => ['type' => self::TYPE_STRING, 'validate' => 'isString', 'lang' => true, 'required' => true, 'db_type' => 'VARCHAR(255)'],
+        ],
+    ];
 
     /**
      * Check if tag exists
@@ -49,23 +55,20 @@ class BeesBlogTag extends BeesBlogObjectModel
      * @param int|null $idLang Language ID
      *
      * @return bool
-     * @throws PrestaShopDatabaseException
+     * @throws \PrestaShopDatabaseException
      */
     public static function tagExists($tag, $idLang = null)
     {
         if (empty($idLang)) {
-            $idLang = (int) Context::getContext()->language->id;
+            $idLang = (int) \Context::getContext()->language->id;
         }
 
-        $sql = new DbQuery();
-        $sql->select('`id_tag`');
-        $sql->from('bees_blog_tag');
+        $sql = new \DbQuery();
+        $sql->select(self::PRIMARY);
+        $sql->from(self::TABLE);
         $sql->where('`id_lang` = '.(int) $idLang);
         $sql->where('`name` = \''.pSQL($tag).'\'');
-        if (!$posts = Db::getInstance()->executeS($sql)) {
-            return false;
-        }
 
-        return $posts[0]['id_tag'];
+        return (bool) \Db::getInstance()->getValue($sql);
     }
 }

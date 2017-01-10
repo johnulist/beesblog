@@ -27,9 +27,9 @@
 {/foreach}
     </div>
  {/if}
- {if isset($coolcustomcss)}
+ {if isset($beescustomcss)}
     <style>
-        {$coolcustomcss}
+        {$beescustomcss}
     </style>
 {/if}
 

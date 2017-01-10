@@ -28,9 +28,9 @@
 		<p class="error">{l s='No posts' mod='beesblog'}</p>
 	{/if}
 {else}
-	{if $cooldisablecatimg == '1'}
+	{if $beesdisablecatimg == '1'}
 		{assign var="activeimgincat" value='0'}
-		{$activeimgincat = $coolshownoimg}
+		{$activeimgincat = $beesshownoimg}
 		{if $title_category != ''}
 			{foreach from=$categoryinfo item=category}
 				<div id="sdsblogCategory">
@@ -59,7 +59,7 @@
 								{assign var="options" value=null}
 								{$options.page = $k+1}
 								{$options.id_category = $id_category}
-								{$options.slug = $cat_link_rewrite}
+								{$options.url_key = $cat_link_rewrite}
 							{else}
 								{assign var="options" value=null}
 								{$options.page = $k+1}
@@ -81,7 +81,7 @@
 					</ul>
 				</div>
 				<div class="col-md-6">
-					<div class="results">{l s="Showing" mod="beesblog"} {if $limit_start!=0}{$limit_start}{else}1{/if} {l s="to" mod="coollatestnews"} {if $limit_start+$limit >= $total}{$total}{else}{$limit_start+$limit}{/if} {l s="of" mod="beesblog"} {$total}
+					<div class="results">{l s="Showing" mod="beesblog"} {if $limit_start!=0}{$limit_start}{else}1{/if} {l s="to" mod="beeslatestnews"} {if $limit_start+$limit >= $total}{$total}{else}{$limit_start+$limit}{/if} {l s="of" mod="beesblog"} {$total}
 						({$c} {l s="Pages" mod="beesblog"})
 					</div>
 				</div>
@@ -89,8 +89,8 @@
 		</div>
 	{/if}
 {/if}
-{if isset($coolcustomcss)}
+{if isset($beescustomcss)}
 	<style>
-		{$coolcustomcss|escape:'htmlall':'UTF-8'}
+		{$beescustomcss|escape:'htmlall':'UTF-8'}
 	</style>
 {/if}

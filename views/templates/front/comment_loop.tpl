@@ -26,7 +26,7 @@
 				</div>
 				<p>{$childcommnets.content}</p>
 				{* TODO: remove direct configuration get *}
-				{if Configuration::get('coolenablecomment') == 1}
+				{if Configuration::get('beesenablecomment') == 1}
 					{if $comment_status == 1}
 						<div class="reply">
 							{* TODO: remove smarty.get *}
